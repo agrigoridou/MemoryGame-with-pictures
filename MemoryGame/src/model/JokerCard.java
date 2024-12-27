@@ -1,20 +1,20 @@
 package model;
 
 public class JokerCard extends Card {
-    private String jokerEffect;
+    private final String imagePath;  // Χρησιμοποιούμε την εικόνα του μπαλαντέρ
 
-    public JokerCard(int id, String jokerEffect) {
+    public JokerCard(int id, String imagePath) {
         super(id);  // Αναθέτουμε το id μέσω του κατασκευαστή της υπερκλάσης
-        this.jokerEffect = jokerEffect;
+        this.imagePath = imagePath;
         this.isFlipped = false;  // Μπορείς να το αφήσεις έτσι ή να το ρυθμίσεις μέσω του κατασκευαστή αν χρειάζεται
     }
 
     @Override
     public boolean isMatch(Card card) {
-        return true; // Η κάρτα "Joker" ταιριάζει με όλες τις άλλες
+        return card instanceof ImageCard && ((ImageCard) card).getImagePath().equals(this.imagePath);
     }
 
-    public String getJokerEffect() {
-        return jokerEffect;
+    public String getImagePath() {
+        return imagePath;
     }
 }
