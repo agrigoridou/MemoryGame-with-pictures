@@ -3,6 +3,7 @@ package gui;
 import controller.GameController;
 import model.Card;
 import model.GameBoard;
+import model.ImageCard;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,25 +62,48 @@ public class GameGUI implements GUIInterface {
 
     @Override
     public void updateBoard(GameBoard board) {
-        boardPanel.removeAll();
+        boardPanel.removeAll();  // Clear previous board
         for (Card card : board.getCards()) {
             JButton cardButton = new JButton();
-            cardButton.setBackground(Color.YELLOW);
-            cardButton.setText(card.isFlipped() ? "✓" : "");
+
+            // If the card is flipped, load its image
+            if (card.isFlipped()) {
+                ImageCard imageCard = (ImageCard) card;  // Ensure the card is ImageCard
+                String imagePath = imageCard.getImagePath();
+                java.net.URL imageUrl = getClass().getResource(imagePath);  // Get image URL
+
+                if (imageUrl != null) {
+                    ImageIcon icon = new ImageIcon(imageUrl);
+                    cardButton.setIcon(icon);  // Set the image on the card
+                } else {
+                    // Handle the case where the image path is invalid
+                    System.err.println("Image not found: " + imagePath);
+                    cardButton.setText("Image not found");  // Display an error message on the button
+                }
+            } else {
+                cardButton.setText("");  // No text or image when card is not flipped
+                cardButton.setBackground(Color.YELLOW);  // Set background for hidden cards
+            }
+
+            // Action when the card is selected
             cardButton.addActionListener(e -> {
                 controller.cardSelected(card);
-                updateBoard(board); // Ενημέρωση του ταμπλό
+                updateBoard(board);  // Update the board
                 scoreLabel.setText("Score: " + controller.getScore());
-                attemptsLabel.setText("Failed Attempts: " + board.getCards().size()); // Adjusted here
+                attemptsLabel.setText("Failed Attempts: " + board.getCards().size());
                 if (controller.isGameWon()) {
                     showMessage("Congratulations, you won!");
                 }
             });
-            boardPanel.add(cardButton);
+
+            boardPanel.add(cardButton);  // Add the button to the panel
         }
+
         frame.revalidate();
         frame.repaint();
     }
+
+
 
     @Override
     public void showMessage(String message) {
