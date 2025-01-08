@@ -1,5 +1,8 @@
 package record;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class GameRecord {
     private String playerName;
     private int score;
@@ -10,9 +13,13 @@ public class GameRecord {
     }
 
     public void saveRecordToFile() {
-        // Αποθήκευση του σκορ σε αρχείο
-        System.out.println("Record saved for " + playerName + " with score " + score);
+        try (FileWriter writer = new FileWriter("game_records.txt", true)) {
+            writer.write(playerName + ": " + score + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     public void loadRecords() {
         // Φόρτωση των αποτελεσμάτων

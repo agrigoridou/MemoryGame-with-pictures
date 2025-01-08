@@ -1,6 +1,6 @@
 package gui;
-import model.GameBoard;
 
+import model.GameBoard;
 
 public interface GUIInterface {
     void updateBoard(GameBoard board);

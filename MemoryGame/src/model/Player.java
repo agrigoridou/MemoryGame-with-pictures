@@ -9,16 +9,19 @@ public class Player {
         this.failedAttempts = 0;
     }
 
-    public void incrementFailed() {
-        this.failedAttempts++;
+    public String getName() {
+        return name;
     }
 
     public int getFailedAttempts() {
         return failedAttempts;
     }
 
-    public String getName() {
-        return name;
+    public void incrementFailed() {
+        failedAttempts++;
+    }
+
+    public void setFailedAttempts(int failedAttempts) {
+        this.failedAttempts = failedAttempts;
     }
 }
-

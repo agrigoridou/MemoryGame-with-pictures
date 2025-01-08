@@ -10,7 +10,9 @@ public abstract class Card {
     }
 
     // Η μέθοδος isMatch πρέπει να υλοποιείται από τις υποκλάσεις
-    public abstract boolean isMatch(Card card);
+    public boolean isMatch(Card card) {
+        return false;
+    }
 
     // Μέθοδος για να αναστρέψουμε την κατάσταση flip
     public void flip() {

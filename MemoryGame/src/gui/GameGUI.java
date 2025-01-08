@@ -4,16 +4,18 @@ import controller.GameController;
 import model.Card;
 import model.GameBoard;
 import model.ImageCard;
+import model.JokerCard;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GameGUI implements GUIInterface {
-    private final GameController controller;  // Made final
+    private final GameController controller;
     private JFrame frame;
     private JPanel boardPanel;
     private JLabel scoreLabel;
     private JLabel attemptsLabel;
+    private JLabel remainingCardsLabel;
 
     public GameGUI(GameController controller) {
         this.controller = controller;
@@ -23,7 +25,7 @@ public class GameGUI implements GUIInterface {
     private void initializeGUI() {
         frame = new JFrame("Memory Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 600);
+        frame.setSize(800, 600);
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Options");
@@ -33,16 +35,18 @@ public class GameGUI implements GUIInterface {
         menuBar.add(menu);
         frame.setJMenuBar(menuBar);
 
-        JPanel statusPanel = new JPanel(new GridLayout(1, 2));
+        JPanel statusPanel = new JPanel(new GridLayout(1, 3));
         scoreLabel = new JLabel("Score: 0");
         attemptsLabel = new JLabel("Failed Attempts: 0");
+        remainingCardsLabel = new JLabel("Remaining Cards: " + controller.getGameBoard().getCards().size());
         statusPanel.add(scoreLabel);
         statusPanel.add(attemptsLabel);
+        statusPanel.add(remainingCardsLabel);
 
         frame.add(statusPanel, BorderLayout.NORTH);
 
         boardPanel = new JPanel();
-        boardPanel.setLayout(new GridLayout(4, 4));
+        boardPanel.setLayout(new GridLayout(controller.getGameBoard().getRows(), controller.getGameBoard().getCols()));
         frame.add(boardPanel, BorderLayout.CENTER);
 
         frame.setVisible(true);
@@ -62,48 +66,51 @@ public class GameGUI implements GUIInterface {
 
     @Override
     public void updateBoard(GameBoard board) {
-        boardPanel.removeAll();  // Clear previous board
+        boardPanel.removeAll();
+
         for (Card card : board.getCards()) {
             JButton cardButton = new JButton();
 
-            // If the card is flipped, load its image
             if (card.isFlipped()) {
-                ImageCard imageCard = (ImageCard) card;  // Ensure the card is ImageCard
-                String imagePath = imageCard.getImagePath();
-                java.net.URL imageUrl = getClass().getResource(imagePath);  // Get image URL
-
-                if (imageUrl != null) {
-                    ImageIcon icon = new ImageIcon(imageUrl);
-                    cardButton.setIcon(icon);  // Set the image on the card
-                } else {
-                    // Handle the case where the image path is invalid
-                    System.err.println("Image not found: " + imagePath);
-                    cardButton.setText("Image not found");  // Display an error message on the button
+                if (card instanceof ImageCard imageCard) {
+                    String imagePath = imageCard.getImagePath();
+                    java.net.URL imageUrl = getClass().getResource(imagePath);
+                    if (imageUrl != null) {
+                        ImageIcon icon = new ImageIcon(imageUrl);
+                        cardButton.setIcon(icon);
+                    } else {
+                        cardButton.setText("Image not found");
+                    }
+                } else if (card instanceof JokerCard) {
+                    cardButton.setText("Joker");
+                    cardButton.setBackground(Color.GRAY);
                 }
             } else {
-                cardButton.setText("");  // No text or image when card is not flipped
-                cardButton.setBackground(Color.YELLOW);  // Set background for hidden cards
+                cardButton.setText("");
+                cardButton.setBackground(Color.YELLOW);
             }
 
-            // Action when the card is selected
             cardButton.addActionListener(e -> {
                 controller.cardSelected(card);
-                updateBoard(board);  // Update the board
+                updateBoard(board);
                 scoreLabel.setText("Score: " + controller.getScore());
-                attemptsLabel.setText("Failed Attempts: " + board.getCards().size());
+                attemptsLabel.setText("Failed Attempts: " + controller.getPlayer().getFailedAttempts());
+                remainingCardsLabel.setText("Remaining Cards: " +
+                        (board.getCards().size() - controller.getGameBoard().getCards().stream().filter(Card::isFlipped).count()));
+
                 if (controller.isGameWon()) {
                     showMessage("Congratulations, you won!");
+                } else if (controller.getPlayer().getFailedAttempts() >= controller.getGameBoard().getRows() * controller.getGameBoard().getCols() / 4) {
+                    showMessage("Game Over, you lost!");
                 }
             });
 
-            boardPanel.add(cardButton);  // Add the button to the panel
+            boardPanel.add(cardButton);
         }
 
         frame.revalidate();
         frame.repaint();
     }
-
-
 
     @Override
     public void showMessage(String message) {
@@ -114,4 +121,6 @@ public class GameGUI implements GUIInterface {
     public void saveGameRecord(String playerName, int score) {
         System.out.println("Game record saved for " + playerName + " with score " + score);
     }
+
+
 }

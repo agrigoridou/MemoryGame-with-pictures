@@ -11,8 +11,12 @@ public class JokerCard extends Card {
 
     @Override
     public boolean isMatch(Card card) {
-        return card instanceof ImageCard && ((ImageCard) card).getImagePath().equals(this.imagePath);
+        if (card instanceof JokerCard) {
+            return true;  // Joker cards match each other
+        }
+        return super.isMatch(card);  // Fall back to the ImageCard matching logic
     }
+
 
     public String getImagePath() {
         return imagePath;

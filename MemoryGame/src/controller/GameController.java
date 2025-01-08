@@ -1,13 +1,11 @@
 package controller;
 
-import model.Card;
-import model.GameBoard;
-import model.Player;
+import model.*;
 
 public class GameController implements GameInterface {
-    private GameBoard gameBoard;  // Made final
-    private final Player player;        // Made final
-    private final String theme;         // Made final
+    private GameBoard gameBoard;
+    private final Player player;
+    private final String theme;
     private int score;
     private int matchedPairs;
 
@@ -17,6 +15,14 @@ public class GameController implements GameInterface {
         this.gameBoard = new GameBoard(rows, cols, theme);
         this.score = 0;
         this.matchedPairs = 0;
+    }
+
+    public GameController() {
+        this("Default", 4, 4, new Player("Player"));
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     @Override
@@ -30,22 +36,36 @@ public class GameController implements GameInterface {
             card.flip();
             System.out.println("Card flipped: " + card);
 
-            // Check if the cards match
-            Card firstFlipped = gameBoard.getFirstFlippedCard();
-            if (firstFlipped != null && firstFlipped != card) {
-                if (firstFlipped.isMatch(card)) {
-                    System.out.println("Match found!");
-                    matchedPairs++;
-                    score += 10; // Add score for matched pairs
-                } else {
-                    System.out.println("No match!");
-                    player.incrementFailed(); // Increment failed attempts
-                    firstFlipped.flip(); // Flip back the first card
-                    card.flip(); // Flip back the current card
+            if (card instanceof JokerCard jokerCard) {
+                // Reveal all cards matching the Joker image
+                String jokerImagePath = jokerCard.getImagePath();
+                for (Card c : gameBoard.getCards()) {
+                    if (c instanceof ImageCard imageCard && imageCard.getImagePath().equals(jokerImagePath)) {
+                        c.flip();
+                    }
+                }
+                System.out.println("Joker card used! Revealed matching cards.");
+                matchedPairs += 2; // Assume Joker reveals two pairs
+                score += 20; // Bonus for Joker
+            } else {
+                // Handle regular card flipping logic
+                Card firstFlipped = gameBoard.getFirstFlippedCard();
+                if (firstFlipped != null && firstFlipped != card) {
+                    if (firstFlipped.isMatch(card)) {
+                        System.out.println("Match found!");
+                        matchedPairs++;
+                        score += 10; // Add score for matched pairs
+                    } else {
+                        System.out.println("No match!");
+                        player.incrementFailed(); // Increment failed attempts
+                        firstFlipped.flip(); // Flip back the first card
+                        card.flip(); // Flip back the current card
+                    }
                 }
             }
         }
     }
+
 
     @Override
     public void updateScore() {
@@ -58,7 +78,7 @@ public class GameController implements GameInterface {
         this.gameBoard = new GameBoard(gameBoard.getRows(), gameBoard.getCols(), theme);
         this.score = 0;
         this.matchedPairs = 0;
-        player.incrementFailed(); // Reset failed attempts
+        player.setFailedAttempts(0);
         System.out.println("Game reset with theme: " + theme);
     }
 

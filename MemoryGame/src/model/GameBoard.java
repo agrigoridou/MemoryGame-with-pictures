@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class GameBoard {
-    private int rows;
-    private int cols;
-    private List<Card> cards;
+    private final int rows;
+    private final int cols;
+    private final List<Card> cards;
 
     public GameBoard(int rows, int cols, String theme) {
         this.rows = rows;
@@ -20,24 +20,25 @@ public class GameBoard {
         List<String> imagePaths = loadThemeImages(theme);
 
         // Ensure there are enough images for the board
-        if (imagePaths.size() < (rows * cols) / 2) {  // Adjusted for joker cards
+        if (imagePaths.size() < (rows * cols) / 2 - 1) {
             throw new IllegalArgumentException("Not enough images for the selected theme.");
         }
 
         // Create pairs of cards
         for (int i = 0; i < (rows * cols) / 2 - 1; i++) {
             String imagePath = imagePaths.get(i);
-            cards.add(new ImageCard(i, imagePath)); // First pair
-            cards.add(new ImageCard(i + 1, imagePath)); // Second pair
+            cards.add(new ImageCard(i, imagePath));
+            cards.add(new ImageCard(i, imagePath));
         }
 
         // Add joker cards
-        cards.add(new JokerCard(999, imagePaths.get(0))); // First joker
-        cards.add(new JokerCard(1000, imagePaths.get(1))); // Second joker
+        cards.add(new JokerCard(999, imagePaths.get(0)));
+        cards.add(new JokerCard(1000, imagePaths.get(1)));
 
         // Shuffle the cards
         Collections.shuffle(cards);
     }
+
 
     private List<String> loadThemeImages(String theme) {
         List<String> imagePaths = new ArrayList<>();

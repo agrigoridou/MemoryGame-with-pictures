@@ -5,22 +5,19 @@ import model.Player;
 
 public class Main {
     public static void main(String[] args) {
-        // Get the player's name from a dialog box
         String playerName = JOptionPane.showInputDialog("Enter your name:");
-        Player player = new Player(playerName);
+        if (playerName == null || playerName.trim().isEmpty()) {
+            playerName = "Player";
+        }
 
-        // Display a dialog to select the theme
         String[] themes = {"Animals", "Numbers", "Letters"};
         String theme = (String) JOptionPane.showInputDialog(null, "Select a theme:", "Theme Selection",
                 JOptionPane.QUESTION_MESSAGE, null, themes, themes[0]);
 
-        // Initialize the game controller with the selected theme
-        GameController controller = new GameController(theme, 4, 4, player);
+        GameController controller = new GameController(theme, 4, 4, new Player(playerName));
 
-        // Initialize the game GUI
-        GameGUI gui = new GameGUI(controller);
+        new GameGUI(controller);
 
-        // Start the game
         controller.startGame();
     }
 }
