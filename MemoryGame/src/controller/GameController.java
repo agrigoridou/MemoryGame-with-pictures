@@ -1,11 +1,12 @@
 package controller;
 
 import model.*;
+import record.GameRecord;
 
 // Η κλάση GameController διαχειρίζεται τη λογική του παιχνιδιού
 public class GameController implements GameInterface {
     private GameBoard gameBoard; // Το ταμπλό του παιχνιδιού
-    private final Player player; // Ο παίκτης
+    private Player player; // Ο παίκτης
     private final String theme; // Το θέμα του παιχνιδιού
     private int score; // Το σκορ του παίκτη
     private int matchedPairs; // Ο αριθμός των ζευγαριών που έχουν βρεθεί
@@ -94,5 +95,45 @@ public class GameController implements GameInterface {
     // Επιστρέφει τον παίκτη
     public Player getPlayer() {
         return player;
+    }
+
+    @Override
+    public void startNewGame(String playerName, String selectedLevel) {
+        // Δημιουργούμε τον νέο παίκτη με το όνομα που πληκτρολόγησε ο χρήστης
+        Player newPlayer = new Player(playerName);
+
+        // Δημιουργούμε καινούργιο παιχνίδι με τις παραμέτρους που καθορίστηκαν
+        int rows = 0, cols = 0;
+
+        switch (selectedLevel) {
+            case "Easy (4x4)":
+                rows = 4;
+                cols = 4;
+                break;
+            case "Medium (8x8)":
+                rows = 8;
+                cols = 8;
+                break;
+            case "Hard (10x10)":
+                rows = 10;
+                cols = 10;
+                break;
+        }
+
+        // Επαναδημιουργούμε το παιχνίδι με τις καθορισμένες παραμέτρους
+        this.gameBoard = new GameBoard(rows, cols, "Animals"); // Εδώ μπορείς να χρησιμοποιήσεις το θέμα που θέλεις
+        this.player = newPlayer;
+
+        // Όταν το παιχνίδι τελειώσει (νίκη ή ήττα), αποθηκεύουμε το σκορ
+        saveGameRecord(newPlayer.getName(), getScore());
+    }
+
+    public void saveGameRecord(String playerName, int score) {
+        // Δημιουργούμε ένα νέο αντικείμενο GameRecord για να αποθηκεύσουμε τα αποτελέσματα
+        GameRecord record = new GameRecord(playerName, score);
+        record.saveRecordToFile(); // Αποθήκευση του σκορ στο αρχείο
+    }
+
+    public void cancelGame() {
     }
 }

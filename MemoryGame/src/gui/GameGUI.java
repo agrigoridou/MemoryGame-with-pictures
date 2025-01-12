@@ -8,6 +8,7 @@ import model.JokerCard;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class GameGUI implements GUIInterface {
     private final GameController controller; // Ο controller διαχειρίζεται τη λογική του παιχνιδιού
@@ -32,10 +33,37 @@ public class GameGUI implements GUIInterface {
 
         // Δημιουργία μενού επιλογών
         JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("Options"); // Δημιουργία μενού "Options"
+        JMenu menu = new JMenu("Options:"); // Δημιουργία μενού "Options"
+
         JMenuItem themeItem = new JMenuItem("Select Theme"); // Δημιουργία επιλογής για αλλαγή θέματος
         themeItem.addActionListener(e -> selectTheme()); // Σύνδεση του κουμπιού με τη μέθοδο επιλογής θέματος
+
+        JMenuItem startNewGameItem = new JMenuItem("Start New Game");
+        startNewGameItem.addActionListener(e -> startNewGame());
+
+        JMenuItem cancelGameItem = new JMenuItem("Cancel Game");
+        cancelGameItem.addActionListener(e -> cancelGame());
+
+        JMenuItem showRecordsItem = new JMenuItem("Show Records");
+        showRecordsItem.addActionListener(e -> showRecords());
+
+        JMenuItem showInstructionsItem = new JMenuItem("Instructions");
+        showInstructionsItem.addActionListener(e -> showInstructions());
+
+        JMenuItem showAboutItem = new JMenuItem("About");
+        showAboutItem.addActionListener(e -> showAbout());
+
+        JMenuItem exitItem = new JMenuItem("Exit");
+        exitItem.addActionListener(e -> System.exit(0));
+
         menu.add(themeItem); // Προσθήκη επιλογής στο μενού
+        menu.add(startNewGameItem);
+        menu.add(cancelGameItem);
+        menu.add(showRecordsItem);
+        menu.add(showInstructionsItem);
+        menu.add(showAboutItem);
+        menu.addSeparator();
+        menu.add(exitItem);
         menuBar.add(menu); // Προσθήκη του μενού στο μενού της εφαρμογής
         frame.setJMenuBar(menuBar); // Σύνδεση του μενού με το παράθυρο
 
@@ -58,6 +86,66 @@ public class GameGUI implements GUIInterface {
         frame.setVisible(true); // Εμφάνιση του παραθύρου στον χρήστη
         updateBoard(controller.getGameBoard()); // Ενημέρωση του πίνακα με τις κάρτες
     }
+
+    // Μέθοδος για την εκκίνηση ενός νέου παιχνιδιού
+    private void startNewGame() {
+        String playerName = JOptionPane.showInputDialog("Enter your name:");
+        String[] levels = {"Easy (4x4)", "Medium (8x8)", "Hard (10x10)"};
+        String selectedLevel = (String) JOptionPane.showInputDialog(frame, "Select difficulty:", "Difficulty",
+                JOptionPane.QUESTION_MESSAGE, null, levels, levels[0]);
+        if (playerName != null && selectedLevel != null) {
+            controller.startNewGame(playerName, selectedLevel);
+            updateBoard(controller.getGameBoard());
+        }
+    }
+
+    // Μέθοδος για ακύρωση του παιχνιδιού
+    private void cancelGame() {
+        int response = JOptionPane.showConfirmDialog(frame, "Are you sure you want to cancel the game?", "Cancel Game", JOptionPane.YES_NO_OPTION);
+        if (response == JOptionPane.YES_OPTION) {
+            controller.cancelGame();
+            frame.dispose(); // Κλείσιμο παραθύρου
+        }
+    }
+
+    // Μέθοδος για εμφάνιση ρεκόρ προηγούμενων παικτών
+    private void showRecords() {
+        // Δημιουργία μιας συμβολοσειράς για να αποθηκεύσουμε τα ρεκόρ
+        StringBuilder records = new StringBuilder("Game Records:\n");
+
+        try {
+            // Διαβάζουμε τα αποτελέσματα από το αρχείο "game_records.txt"
+            java.nio.file.Path path = java.nio.file.Paths.get("game_records.txt");
+            if (java.nio.file.Files.exists(path)) {
+                // Διαβάζουμε το αρχείο γραμμή προς γραμμή
+                java.util.List<String> lines = java.nio.file.Files.readAllLines(path);
+                for (String line : lines) {
+                    records.append(line).append("\n"); // Προσθήκη κάθε γραμμής στα ρεκόρ
+                }
+            } else {
+                records.append("No records found.");
+            }
+        } catch (IOException e) {
+            records.append("Error loading records.");
+        }
+
+        // Εμφανίζουμε τα ρεκόρ στο χρήστη
+        JOptionPane.showMessageDialog(frame, records.toString());
+    }
+
+
+    // Μέθοδος για εμφάνιση οδηγιών παιχνιδιού
+    private void showInstructions() {
+        String instructions = "Memory Game Instructions:\n1. Flip two cards at a time.\n2. Try to match pairs.\n3. Use Jokers to help match cards.";
+        JOptionPane.showMessageDialog(frame, instructions);
+    }
+
+    // Μέθοδος για εμφάνιση πληροφοριών για την ομάδα ανάπτυξης
+    private void showAbout() {
+        String aboutInfo = "Game developed by: Grigoridou Athanasia.";
+        JOptionPane.showMessageDialog(frame, aboutInfo);
+    }
+
 
     // Μέθοδος για επιλογή θέματος από τον χρήστη
     private void selectTheme() {
@@ -183,5 +271,8 @@ public class GameGUI implements GUIInterface {
     public void saveGameRecord(String playerName, int score) {
         // Προσωρινή αποθήκευση του σκορ (εδώ εμφανίζεται στην κονσόλα για απλότητα)
         System.out.println("Game record saved for " + playerName + " with score " + score);
+    }
+
+    public void setController(GameController controller) {
     }
 }

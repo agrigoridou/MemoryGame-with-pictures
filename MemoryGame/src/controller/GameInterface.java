@@ -16,4 +16,6 @@ public interface GameInterface {
 
     // Μέθοδος για την επαναφορά του παιχνιδιού (π.χ. μετά από μία ολοκλήρωση ή επανεκκίνηση)
     void resetGame();
+
+    void startNewGame(String playerName, String selectedLevel);
 }

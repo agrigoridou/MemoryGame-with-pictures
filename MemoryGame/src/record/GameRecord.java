@@ -15,18 +15,12 @@ public class GameRecord {
 
     // Μέθοδος για την αποθήκευση του αποτελέσματος στο αρχείο "game_records.txt"
     public void saveRecordToFile() {
-        try (FileWriter writer = new FileWriter("game_records.txt", true)) {
+        try (FileWriter writer = new FileWriter("record/game_records.txt", true)) {
             // Άνοιγμα του αρχείου για εγγραφή (με παραμονή στο τέλος του αρχείου)
             writer.write(playerName + ": " + score + "\n");  // Γράφουμε το όνομα του παίκτη και το σκορ στο αρχείο
         } catch (IOException e) {
             // Αν παρουσιαστεί σφάλμα κατά την εγγραφή στο αρχείο, το εκτυπώνουμε
             e.printStackTrace();  // Εκτύπωση του σφάλματος
         }
-    }
-
-    // Μέθοδος για την φόρτωση των αποτελεσμάτων (προς το παρόν εκτυπώνει απλά μήνυμα)
-    public void loadRecords() {
-        // Φόρτωση των αποτελεσμάτων
-        System.out.println("Loading records...");  // Για την ώρα, απλώς εκτυπώνουμε μήνυμα για την φόρτωση
     }
 }
