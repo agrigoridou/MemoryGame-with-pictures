@@ -53,34 +53,34 @@ public class GameBoard {
         // Ανάλογα με το επιλεγμένο θέμα, επιστρέφουμε τις αντίστοιχες εικόνες
         switch (theme) {
             case "Animals": // Θέμα ζώων
-                imagePaths.add("resources/animal_fish.png");
-                imagePaths.add("resources/animal_owl.png");
-                imagePaths.add("resources/animal_cat.png");
-                imagePaths.add("resources/animal_dog.png");
-                imagePaths.add("resources/animal_lion.png");
-                imagePaths.add("resources/animal_elephant.png");
-                imagePaths.add("resources/animal_tiger.png");
-                imagePaths.add("resources/animal_bear.png");
+                imagePaths.add("animal_fish.jpg");
+                imagePaths.add("animal_owl.jpg");
+                imagePaths.add("animal_cat.jpg");
+                imagePaths.add("animal_dog.jpg");
+                imagePaths.add("animal_lion.jpg");
+                imagePaths.add("animal_elephant.jpg");
+                imagePaths.add("animal_tiger.jpg");
+                imagePaths.add("animal_bear.jpg");
                 break;
             case "Numbers": // Θέμα αριθμών
-                imagePaths.add("resources/number_1.png");
-                imagePaths.add("resources/number_2.png");
-                imagePaths.add("resources/number_3.png");
-                imagePaths.add("resources/number_4.png");
-                imagePaths.add("resources/number_5.png");
-                imagePaths.add("resources/number_6.png");
-                imagePaths.add("resources/number_7.png");
-                imagePaths.add("resources/number_8.png");
+                imagePaths.add("number_1.jpg");
+                imagePaths.add("number_2.jpg");
+                imagePaths.add("number_3.jpg");
+                imagePaths.add("number_4.jpg");
+                imagePaths.add("number_5.jpg");
+                imagePaths.add("number_6.jpg");
+                imagePaths.add("number_7.jpg");
+                imagePaths.add("number_8.jpg");
                 break;
             case "Letters": // Θέμα γραμμάτων
-                imagePaths.add("resources/letter_A.png");
-                imagePaths.add("resources/letter_B.png");
-                imagePaths.add("resources/letter_C.png");
-                imagePaths.add("resources/letter_D.png");
-                imagePaths.add("resources/letter_E.png");
-                imagePaths.add("resources/letter_F.png");
-                imagePaths.add("resources/letter_G.png");
-                imagePaths.add("resources/letter_H.png");
+                imagePaths.add("letter_A.jpg");
+                imagePaths.add("letter_B.jpg");
+                imagePaths.add("letter_C.jpg");
+                imagePaths.add("letter_D.jpg");
+                imagePaths.add("letter_E.jpg");
+                imagePaths.add("letter_F.jpg");
+                imagePaths.add("letter_G.jpg");
+                imagePaths.add("letter_H.jpg");
                 break;
             default:
                 // Εάν το θέμα είναι άγνωστο, πετάμε εξαίρεση

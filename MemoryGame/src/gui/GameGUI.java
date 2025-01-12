@@ -81,28 +81,57 @@ public class GameGUI implements GUIInterface {
             JButton cardButton = new JButton(); // Δημιουργία κουμπιού που αντιπροσωπεύει την κάρτα
             cardButton.setPreferredSize(new Dimension(50, 80)); // Ορισμός διαστάσεων κουμπιού
 
-            if (card.isFlipped()) { // Αν η κάρτα είναι ανοιχτή
-                if (card instanceof ImageCard imageCard) { // Αν είναι κάρτα εικόνας
-                    // Φόρτωση εικόνας της κάρτας
-                    java.net.URL imageUrl = getClass().getClassLoader().getResource(imageCard.getImagePath());
+            if (card.isFlipped()) {
+                if (card instanceof ImageCard imageCard) {
+                    String imagePath = imageCard.getImagePath();
+
+                    java.net.URL imageUrl = getClass().getClassLoader().getResource(imagePath);
                     if (imageUrl != null) {
-                        ImageIcon icon = new ImageIcon(imageUrl); // Δημιουργία εικονιδίου από τη διαδρομή
-                        // Προσαρμογή της εικόνας στις διαστάσεις του κουμπιού
-                        Image scaledImage = icon.getImage().getScaledInstance(50, 80, Image.SCALE_SMOOTH);
-                        cardButton.setIcon(new ImageIcon(scaledImage)); // Ορισμός της εικόνας στο κουμπί
+                        ImageIcon icon = new ImageIcon(imageUrl);
+                        if (icon.getIconWidth() == -1 || icon.getIconHeight() == -1) {
+                            System.out.println("Error loading image at path: " + imagePath);
+                        } else {
+                            System.out.println("Image loaded successfully from path: " + imagePath);
+                            Image scaledImage = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                            cardButton.setIcon(new ImageIcon(scaledImage));
+                        }
                     } else {
-                        // Αν η εικόνα δεν βρεθεί, εμφάνιση μηνύματος στο κουμπί
+                        System.out.println("Image not found: " + imagePath);
                         cardButton.setText("Image not found");
-                        cardButton.setBackground(Color.GRAY); // Χρώμα γκρι για έλλειψη εικόνας
+                        cardButton.setBackground(Color.GRAY);
                     }
-                } else if (card instanceof JokerCard) { // Αν η κάρτα είναι τύπου Joker
-                    cardButton.setText("Joker"); // Κείμενο "Joker" στο κουμπί
-                    cardButton.setBackground(Color.GRAY); // Χρώμα γκρι για το Joker
+
+                } else if (card instanceof JokerCard jokerCard) {
+                    cardButton.setText("JOKER");
+                    cardButton.setBackground(Color.GRAY);
+                    String imagePath = jokerCard.getImagePath();
+
+                    // Βρες τις άλλες κάρτες με την ίδια εικόνα και αποκάλεσέ τες
+                    for (Card c : board.getCards()) {
+                        if (c instanceof ImageCard imageCard && imageCard.getImagePath().equals(imagePath)) {
+                            imageCard.setFlipped(true); // Αποκάλυψη της αντίστοιχης κάρτας
+                        }
+                    }
+
+                    // Φόρτωσε την εικόνα για το μπαλαντέρ
+                    java.net.URL imageUrl = getClass().getClassLoader().getResource(imagePath);
+                    if (imageUrl != null) {
+                        ImageIcon icon = new ImageIcon(imageUrl);
+                        if (icon.getIconWidth() == -1 || icon.getIconHeight() == -1) {
+                            System.out.println("Error loading image at path: " + imagePath);
+                        } else {
+                            Image scaledImage = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                            cardButton.setIcon(new ImageIcon(scaledImage));
+                        }
+                    } else {
+                        cardButton.setText("Image not found");
+                        cardButton.setBackground(Color.GRAY);
+                    }
                 }
             } else { // Αν η κάρτα είναι κλειστή
-                cardButton.setText(""); // Κενό κείμενο
-                cardButton.setBackground(Color.YELLOW); // Χρώμα κίτρινο για τις κλειστές κάρτες
-                cardButton.setIcon(null); // Καμία εικόνα
+                cardButton.setText("");
+                cardButton.setBackground(Color.YELLOW);
+                cardButton.setIcon(null);
             }
 
             // Επεξεργασία ποντικιού για αλλαγή χρώματος όταν ο χρήστης τοποθετεί το δείκτη πάνω στο κουμπί
