@@ -3,6 +3,9 @@ package controller;
 import model.*;
 import record.GameRecord;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 // Η κλάση GameController διαχειρίζεται τη λογική του παιχνιδιού
 public class GameController implements GameInterface {
     private GameBoard gameBoard; // Το ταμπλό του παιχνιδιού
@@ -40,25 +43,67 @@ public class GameController implements GameInterface {
                         c.flip(); // Αναποδογύρισε όλες τις κάρτες με την ίδια εικόνα όπως το Joker
                     }
                 }
-                matchedPairs += 2; // Προσθέτει δύο στα ζευγάρια καθώς όλα ταιριάζουν
+                matchedPairs += 1; // Αυξάνει κατά 1 το πλήθος των ταιριασμένων ζευγαριών
                 score += 20; // Αυξάνει το σκορ λόγω Joker
             } else {
                 Card firstFlipped = gameBoard.getFirstFlippedCard(); // Εύρεση της πρώτης ανοιχτής κάρτας (αν υπάρχει)
-                if (firstFlipped != null && firstFlipped != card) { // Αν υπάρχει άλλη κάρτα ανοιχτή και δεν είναι η ίδια
+                if (firstFlipped == null) {
+                    gameBoard.setFirstFlippedCard(card); // Θέτει την τρέχουσα κάρτα ως πρώτη ανοιχτή
+                } else {
                     if (firstFlipped.isMatch(card)) { // Έλεγχος αν ταιριάζουν οι δύο κάρτες
                         matchedPairs++; // Αυξάνει τον αριθμό των ταιριασμένων ζευγαριών
                         score += 10; // Αυξάνει το σκορ για επιτυχημένο ταίριασμα
+                        gameBoard.clearFirstFlippedCard(); // Καθαρίζει την αποθηκευμένη πρώτη κάρτα
                     } else { // Αν οι κάρτες δεν ταιριάζουν
                         player.incrementFailed(); // Αυξάνει τις αποτυχημένες προσπάθειες του παίκτη
-                        firstFlipped.flip(); // Κλείνει την πρώτη κάρτα
-                        card.flip(); // Κλείνει τη δεύτερη κάρτα
+                        Timer timer = new Timer(); // Δημιουργία χρονόμετρου
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                firstFlipped.flip(); // Κλείνει την πρώτη κάρτα
+                                card.flip(); // Κλείνει τη δεύτερη κάρτα
+                                gameBoard.clearFirstFlippedCard(); // Καθαρίζει την αποθηκευμένη πρώτη κάρτα
+                                timer.cancel(); // Ακύρωση του χρονόμετρου
+                            }
+                        }, 500); // Καθυστερεί για 0.5 δευτερόλεπτο
                     }
                 }
             }
         } else {
             System.out.println("Card is already flipped."); // Ενημερώνει ότι η κάρτα είναι ήδη ανοιχτή
         }
+
+
     }
+
+
+    // Μέθοδος για να ολοκληρώσουμε το παιχνίδι
+    public void endGame(boolean success) {
+        if (success) {
+            // Αποθηκεύουμε το σκορ και το όνομα του παίκτη
+            GameRecord record = new GameRecord(player.getName(), calculateScore());
+            record.saveRecordToFile();
+            System.out.println("Congratulations! You won the game!");
+            // Επαναφορά του παιχνιδιού
+            resetGame();
+            System.out.println("The game has been reset. You can start a new game!");
+
+        } else {
+            System.out.println("Game over! Better luck next time!");
+            // Επαναφορά του παιχνιδιού
+            resetGame();
+            System.out.println("The game has been reset. You can start a new game!");
+
+
+        }
+
+    }
+
+
+    public int calculateScore() {
+        return score; // Just return the score since it's already tracked
+    }
+
 
     // Ενημερώνει και εμφανίζει το σκορ και τις αποτυχημένες προσπάθειες του παίκτη
     @Override
@@ -70,12 +115,28 @@ public class GameController implements GameInterface {
     // Επαναφέρει το παιχνίδι στην αρχική του κατάσταση
     @Override
     public void resetGame() {
-        this.gameBoard = new GameBoard(gameBoard.getRows(), gameBoard.getCols(), theme); // Επαναδημιουργία του ταμπλό
-        this.score = 0; // Μηδενισμός σκορ
-        this.matchedPairs = 0; // Μηδενισμός ταιριασμένων ζευγαριών
-        player.setFailedAttempts(0); // Μηδενισμός αποτυχημένων προσπαθειών
-        System.out.println("Game reset with theme: " + theme); // Μήνυμα επαναφοράς
+        // Επαναδημιουργία του ταμπλό με νέα τυχαία διάταξη
+        this.gameBoard = new GameBoard(gameBoard.getRows(), gameBoard.getCols(), theme);
+
+        // Επαναφορά χαρακτηριστικών του παιχνιδιού
+        this.score = 0;
+        this.matchedPairs = 0;
+        player.setFailedAttempts(0);
+
+        // Εξασφάλιση ότι όλες οι κάρτες είναι κλειστές
+        for (Card card : gameBoard.getCards()) {
+            if (card.isFlipped()) { // Αν η κάρτα είναι ανοιχτή
+                card.flip(); // Κλείνουμε την κάρτα
+                System.out.println("Card reset: " + card + " | Flipped: " + card.isFlipped());
+
+            }
+        }
+
+        System.out.println("Game reset with theme: " + theme);
     }
+
+
+
 
     // Επιστρέφει το τρέχον ταμπλό του παιχνιδιού
     public GameBoard getGameBoard() {
@@ -121,18 +182,20 @@ public class GameController implements GameInterface {
         }
 
         // Επαναδημιουργούμε το παιχνίδι με τις καθορισμένες παραμέτρους
-        this.gameBoard = new GameBoard(rows, cols, "Animals"); // Εδώ μπορείς να χρησιμοποιήσεις το θέμα που θέλεις
+        this.gameBoard = new GameBoard(rows, cols, theme);
         this.player = newPlayer;
 
         // Όταν το παιχνίδι τελειώσει (νίκη ή ήττα), αποθηκεύουμε το σκορ
-        saveGameRecord(newPlayer.getName(), getScore());
+        // Δημιουργία και αποθήκευση της εγγραφής
+        System.out.println("Saving game record...");
+        GameRecord record = new GameRecord(player.getName(), score);
+        record.saveRecordToFile();
+
+
+
     }
 
-    public void saveGameRecord(String playerName, int score) {
-        // Δημιουργούμε ένα νέο αντικείμενο GameRecord για να αποθηκεύσουμε τα αποτελέσματα
-        GameRecord record = new GameRecord(playerName, score);
-        record.saveRecordToFile(); // Αποθήκευση του σκορ στο αρχείο
-    }
+
 
     public void cancelGame() {
     }

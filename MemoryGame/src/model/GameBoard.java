@@ -104,14 +104,18 @@ public class GameBoard {
         return cols;
     }
 
-    // Επιστρέφει την πρώτη κάρτα που έχει αναστραφεί (ανοιχτεί)
+    private Card firstFlippedCard;
+
     public Card getFirstFlippedCard() {
-        // Διατρέχουμε τις κάρτες και αν βρούμε κάποια που είναι ανοιχτή (flipped), την επιστρέφουμε
-        for (Card card : cards) {
-            if (card.isFlipped()) {
-                return card;
-            }
-        }
-        return null; // Επιστρέφουμε null αν δεν υπάρχει καμία ανοιχτή κάρτα
+        return firstFlippedCard;
     }
+
+    public void setFirstFlippedCard(Card card) {
+        this.firstFlippedCard = card;
+    }
+
+    public void clearFirstFlippedCard() {
+        this.firstFlippedCard = null;
+    }
+
 }

@@ -194,7 +194,7 @@ public class GameGUI implements GUIInterface {
                     cardButton.setBackground(Color.GRAY);
                     String imagePath = jokerCard.getImagePath();
 
-                    // Βρες τις άλλες κάρτες με την ίδια εικόνα και αποκάλεσέ τες
+
                     for (Card c : board.getCards()) {
                         if (c instanceof ImageCard imageCard && imageCard.getImagePath().equals(imagePath)) {
                             imageCard.setFlipped(true); // Αποκάλυψη της αντίστοιχης κάρτας
@@ -245,10 +245,16 @@ public class GameGUI implements GUIInterface {
                 remainingCardsLabel.setText("Remaining Cards: " +
                         (board.getCards().size() - controller.getGameBoard().getCards().stream().filter(Card::isFlipped).count()));
 
+
                 if (controller.isGameWon()) { // Αν ο παίκτης νίκησε
                     showMessage("Congratulations, you won!"); // Εμφάνιση μηνύματος νίκης
+
+
                 } else if (controller.getPlayer().getFailedAttempts() >= controller.getGameBoard().getRows() * controller.getGameBoard().getCols() / 4) { // Αν ο παίκτης έχασε
                     showMessage("Game Over, you lost!"); // Εμφάνιση μηνύματος ήττας
+
+
+
                 }
             });
 
